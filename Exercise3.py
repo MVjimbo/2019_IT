@@ -17,19 +17,21 @@ def get_indices(N, n_batches, split_ratio):
     length_ij=round(length_jk/split_ratio)
     inds = np.array([0, length_ij, length_ij+length_jk])
     yield inds
-    for i in range(1,n_batches):
+    for i in range(1,n_batches-1):
         # todo: move forward batch
-        # calculate new indices
-        if (i==n_batches-1) and (inds[2]+length_jk!=N-1):
-            inds[2]=N-1
-            inds[0]+=length_jk
-            inds[1]=inds[0]+(inds[2]-inds[0])/(1+split_ratio)
-        else:
-            inds+=length_jk
+        # calculate new indice
+        inds+=length_jk
         yield inds
+    if (inds[2]+length_jk!=N-1):
+        inds[2]=N-1
+        inds[0]+=length_jk
+        inds[1]=inds[0]+(inds[2]-inds[0])/(1+split_ratio)
+    else:
+        inds+=length_jk
+    yield inds
 
 def main():
-    for inds in get_indices(100, 20, 0.25):
+    for inds in get_indices(100, 5, 0.25):
         print(inds)
     # expected result:
     # [0, 44, 55]
